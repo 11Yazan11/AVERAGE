@@ -92,7 +92,7 @@
     <h1>Grade Input and Random Generator</h1>
 
     <div class="input-area">
-        <h2>Case 1: Enter 26 Grades Manually</h2>
+        <h2>Case 1: Enter 29 Grades Manually</h2>
         <div id="gradeInputs"></div>
         <button onclick="calculateManualGrades()">Submit Grades</button>
     </div>
@@ -105,10 +105,10 @@
     <div class="result" id="results"></div>
 
     <script>
-        // Create input fields for 26 grades
+        // Create input fields for 29 grades
         function createGradeInputs() {
             let inputArea = document.getElementById('gradeInputs');
-            for (let i = 0; i < 26; i++) {
+            for (let i = 0; i < 29; i++) {
                 let input = document.createElement('input');
                 input.type = 'number';
                 input.min = '0';
@@ -124,12 +124,12 @@
         // Case 1: Calculate grades based on manual input
         function calculateManualGrades() {
             let grades = [];
-            for (let i = 0; i < 26; i++) {
+            for (let i = 0; i < 29; i++) {
                 let grade = parseFloat(document.getElementById('grade' + i).value);
                 if (!isNaN(grade)) {
                     grades.push(grade);
                 } else {
-                    alert('Please enter all 26 grades.');
+                    alert('Please enter all 29 grades.');
                     return;
                 }
             }
@@ -139,7 +139,7 @@
         // Case 2: Generate random grades between 0 and 20, either integers or rounded to 0.5
         function calculateRandomGrades() {
             let grades = [];
-            for (let i = 0; i < 26; i++) {
+            for (let i = 0; i < 29; i++) {
                 let grade = generateRandomGrade();
                 grades.push(grade);
             }
