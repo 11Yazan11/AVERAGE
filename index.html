@@ -30,7 +30,15 @@
     border-radius: 6px;      /* Rounded edges */
     border: 3px solid #2c2f33; /* Space around the scrollbar thumb */
 }
-
+.input-container{
+    background-color: rgb(35, 39, 38);
+    margin-left: 400px;
+    margin-right: 400px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-radius: 10px;
+    color: #7289da;
+}
 
 
         h1, h2 {
@@ -50,6 +58,9 @@
             background-color: #36393f;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
 
         input[type="number"] {
@@ -92,7 +103,7 @@
     <h1>Grade Input and Random Generator</h1>
 
     <div class="input-area">
-        <h2>Case 1: Enter 29 Grades Manually</h2>
+        <h2>Case 1: Enter 26 Grades Manually</h2>
         <div id="gradeInputs"></div>
         <button onclick="calculateManualGrades()">Submit Grades</button>
     </div>
@@ -102,94 +113,121 @@
         <button onclick="calculateRandomGrades()">Generate Grades & Calculate Averages</button>
     </div>
 
+    <div class="input-area" >
+        <span id="increase"> Number of grades that will increase by 3 (only under 10) = 14 </span><br> <br> 
+        <div class="input-container">
+         <input type="range" id="nb" min="1" step="1" max="26"> 
+        </div>
+    </div>
+
     <div class="result" id="results"></div>
 
     <script>
-        // Create input fields for 29 grades
+        // Create input fields for 26 grades
+        const increaseArea = document.getElementById('increase');
+        const incInput = document.getElementById('nb');
+        let increasingGrades = 1;
+    
+        incInput.addEventListener('change', function () {
+            increaseArea.textContent = `Number of grades that will increase by 3 (only under 10) = ${incInput.value}`;
+            increasingGrades = parseInt(incInput.value); // Update the number of grades to adjust
+        });
+    
         function createGradeInputs() {
             let inputArea = document.getElementById('gradeInputs');
-            for (let i = 0; i < 29; i++) {
+            for (let i = 0; i < 26; i++) {
                 let input = document.createElement('input');
                 input.type = 'number';
                 input.min = '0';
                 input.max = '20';
                 input.step = '0.5';
-                input.style.width = "90px"
+                input.style.width = "90px";
                 input.id = 'grade' + i;
-                input.placeholder = `Grade ${i+1}`;
+                input.placeholder = `Grade ${i + 1}`;
                 inputArea.appendChild(input);
             }
         }
-
+    
         // Case 1: Calculate grades based on manual input
         function calculateManualGrades() {
             let grades = [];
-            for (let i = 0; i < 29; i++) {
+            for (let i = 0; i < 26; i++) {
                 let grade = parseFloat(document.getElementById('grade' + i).value);
                 if (!isNaN(grade)) {
                     grades.push(grade);
                 } else {
-                    alert('Please enter all 29 grades.');
+                    alert('Please enter all 26 grades.');
                     return;
                 }
             }
             processGrades(grades);
         }
-
+    
         // Case 2: Generate random grades between 0 and 20, either integers or rounded to 0.5
         function calculateRandomGrades() {
             let grades = [];
-            for (let i = 0; i < 29; i++) {
+            for (let i = 0; i < 26; i++) {
                 let grade = generateRandomGrade();
                 grades.push(grade);
             }
             processGrades(grades);
         }
-
+    
         // Generate random grades rounded to .5 or integers only
         function generateRandomGrade() {
-            random = Math.random() * 20; // generates a random number between 0 and 20
-            randomGrade = Math.round(random * 2) / 2; // rounds to the nearest 0.5 or integer
+            let random = Math.random() * 20; // generates a random number between 0 and 20
+            let randomGrade = Math.round(random * 2) / 2; // rounds to the nearest 0.5 or integer
             return parseFloat(randomGrade.toFixed(1));
         }
-
+    
         // Process the list of grades to calculate original and new averages
         function processGrades(grades) {
             // Calculate the original average
-            let originalAverage = calculateAverage(grades);
-
-            // Adjust grades between 0 (inclusive) and 10 (exclusive) by adding 3 points
-            let adjustedGrades = grades.map(grade => (grade >= 0 && grade < 10) ? grade + 3 : grade);
-
+            let originalGrades = [...grades]; // Clone the array to preserve original grades
+            let originalAverage = calculateAverage(originalGrades);
+    
+            // Find grades less than 10
+            let gradesToAdjust = grades
+                .map((grade, index) => ({ grade, index }))
+                .filter(item => item.grade < 10) // Only grades less than 10
+                .sort((a, b) => a.grade - b.grade); // Sort in ascending order
+    
+            // Adjust only the first 'n' grades, where 'n' is the selected number from the range slider
+            for (let i = 0; i < Math.min(increasingGrades, gradesToAdjust.length); i++) {
+                grades[gradesToAdjust[i].index] += 3;
+            }
+    
             // Calculate the new average with adjusted grades
-            let newAverage = calculateAverage(adjustedGrades);
-
+            let newAverage = calculateAverage(grades);
+    
             // Display the results
-            displayResults(grades, originalAverage, adjustedGrades, newAverage);
+            displayResults(originalGrades, originalAverage, grades, newAverage);
         }
-
+    
         // Function to calculate the average of a list of grades
         function calculateAverage(grades) {
             let total = grades.reduce((acc, grade) => acc + grade, 0);
             return (total / grades.length).toFixed(2);
         }
-
+    
         // Function to display the results on the page
-        function displayResults(grades, originalAverage, adjustedGrades, newAverage) {
+        function displayResults(originalGrades, originalAverage, adjustedGrades, newAverage) {
             let resultDiv = document.getElementById("results");
             resultDiv.innerHTML = `
                 <h2>Original Grades</h2>
-                <p>${grades.join(", ")}</p>
+                <p>${originalGrades.join(", ")}</p>
                 <p><strong>Original Average:</strong> ${originalAverage}</p>
                 
-                <h2>Adjusted Grades (0 ≤ grade < 10) increased by 3 points</h2>
+                <h2>Adjusted Grades (only ${increasingGrades} grade(s) under 10 increased by 3 points)</h2>
                 <p>${adjustedGrades.join(", ")}</p>
                 <p><strong>New Average:</strong> ${newAverage}</p>
             `;
         }
-
+    
         // Initialize the page by creating input fields
         createGradeInputs();
     </script>
+    
+    
 </body>
 </html>
